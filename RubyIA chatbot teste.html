@@ -3,201 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat com IA Gemini</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .dark-mode {
-            background-color: #2d3436;
-            color: #dfe6e9;
-        }
-
-        .chat-container {
-            width: 300px;
-            height: 500px;
-            margin: 20px auto;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 10px;
-            transition: background-color 0.3s;
-        }
-
-        .chat-container.dark-mode {
-            background-color: #444;
-        }
-
-        .messages {
-            flex-grow: 1;
-            overflow-y: scroll;
-            padding-right: 10px;
-            padding-left: 10px;
-        }
-
-        .input-container {
-            display: flex;
-            border-top: 1px solid #ddd;
-            padding: 10px;
-        }
-
-        .input-container input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            outline: none;
-            font-size: 14px;
-        }
-
-        .input-container input:focus {
-            border-color: #6c5ce7;
-        }
-
-        .send-btn {
-            padding: 10px;
-            cursor: pointer;
-            background-color: #6c5ce7;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            margin-left: 10px;
-        }
-
-        .message {
-            display: flex;
-            margin: 10px 0;
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message.ai {
-            justify-content: flex-start;
-        }
-
-        .message .content {
-            max-width: 60%;
-            padding: 10px;
-            border-radius: 15px;
-            margin-bottom: 5px;
-            line-height: 1.4;
-        }
-
-        .message.user .content {
-            background-color: #6c5ce7;
-            color: white;
-        }
-
-        .message.ai .content {
-            background-color: #dfe6e9;
-            color: #2d3436;
-        }
-
-        .dark-mode .message.ai .content {
-            background-color: #3a3333;
-            color: #dfe6e9;
-        }
-
-        .dark-mode .message.user .content {
-            background-color: #6c5ce7;
-        }
-
-        .toggle-btn {
-            cursor: pointer;
-            background-color: #6c5ce7;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 16px;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-    </style>
+    <title>Ruby IA</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-<button class="toggle-btn" id="toggleModeBtn">Modo Claro</button>
-
-<div class="chat-container" id="chatContainer">
-    <div class="messages" id="messages"></div>
-    <div class="input-container">
-        <input type="text" id="userMessage" placeholder="Digite sua mensagem..." />
-        <button class="send-btn" id="sendBtn">Enviar</button>
+    <div class="header">
+        <h1 class="logo">Ruby IA</h1>
+        <button class="theme-toggle" id="toggleModeBtn">Alterar Tema</button>
     </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
-<script>
-    const messagesContainer = document.getElementById("messages");
-    const userMessageInput = document.getElementById("userMessage");
-    const sendBtn = document.getElementById("sendBtn");
-    const chatContainer = document.getElementById("chatContainer");
-    const toggleModeBtn = document.getElementById("toggleModeBtn");
+    <div class="chat-container" id="chatContainer">
+        <div class="messages" id="messages"></div>
+        <div class="input-container">
+            <input type="text" id="userMessage" placeholder="Digite sua mensagem..." />
+            <button class="mic-btn" id="micBtn">🎤</button>
+            <button id="sendBtn">Enviar</button>
+        </div>
+    </div>
 
-    const API_KEY = 'AIzaSyB0kiQ_0MFHpSPo44gN-vVpnO7Fhe-50H8'; // Substitua pela sua chave de API real
-    const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
-
-    const addMessage = (content, isUser) => {
-        const messageDiv = document.createElement("div");
-        messageDiv.classList.add("message", isUser ? "user" : "ai");
-
-        const contentDiv = document.createElement("div");
-        contentDiv.classList.add("content");
-        contentDiv.innerText = content;
-
-        messageDiv.appendChild(contentDiv);
-        messagesContainer.appendChild(messageDiv);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    };
-
-    const sendMessage = async () => {
-        const message = userMessageInput.value.trim();
-        if (message) {
-            addMessage(message, true);
-            userMessageInput.value = '';
-
-            try {
-                const response = await axios.post(`${API_URL}?key=${API_KEY}`, {
-                    contents: [{
-                        parts: [{
-                            text: message
-                        }]
-                    }]
-                });
-
-                const aiResponse = response.data.candidates[0].content.parts[0].text;
-                addMessage(aiResponse, false);
-            } catch (error) {
-                console.error('Erro ao chamar a API do Gemini:', error);
-                addMessage("Desculpe, ocorreu um erro ao processar sua mensagem.", false);
-            }
-        }
-    };
-
-    sendBtn.addEventListener("click", sendMessage);
-    userMessageInput.addEventListener("keypress", (event) => {
-        if (event.key === "Enter") {
-            sendMessage();
-        }
-    });
-
-    toggleModeBtn.addEventListener("click", () => {
-        const isDarkMode = chatContainer.classList.toggle("dark-mode");
-        document.body.classList.toggle("dark-mode", isDarkMode);
-        toggleModeBtn.innerText = isDarkMode ? "Modo Claro" : "Modo Escuro";
-    });
-</script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
